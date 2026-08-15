@@ -1,0 +1,2154 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f6f78">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Presupuestos Express">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="format-detection" content="telephone=no">
+  <title>Presupuestos Express Climatización</title>
+  <style>
+    :root {
+      --bg: #f5f7f8;
+      --surface: #ffffff;
+      --surface-soft: #eef3f5;
+      --text: #1d2a2f;
+      --muted: #66777e;
+      --line: #d7e0e4;
+      --brand: #0f6f78;
+      --brand-strong: #0a555d;
+      --accent: #f0a23a;
+      --ok: #188060;
+      --danger: #a83232;
+      --shadow: 0 14px 38px rgba(28, 48, 56, 0.12);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100svh;
+      color: var(--text);
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+      font-size: 16px;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      color: #fff;
+      background: linear-gradient(135deg, #0e5963 0%, #167982 100%);
+      border-bottom: 4px solid var(--accent);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+
+    .topbar-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: calc(24px + env(safe-area-inset-top)) 0 20px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .brand-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .brand-row > div {
+      min-width: 0;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 4px;
+      font-size: clamp(1.45rem, 3vw, 2.2rem);
+      font-weight: 750;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .subtitle {
+      margin-bottom: 0;
+      color: rgba(255, 255, 255, 0.82);
+      max-width: 760px;
+    }
+
+    .today-pill {
+      min-width: max-content;
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.1);
+      font-size: 0.92rem;
+    }
+
+    .mode-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .mode-tab {
+      min-height: 48px;
+      padding: 13px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius);
+      color: #fff;
+      background: rgba(255, 255, 255, 0.12);
+      text-align: left;
+      transition: background 0.2s, transform 0.2s;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .mode-tab:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .mode-tab.active {
+      color: var(--brand-strong);
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .mode-tab span {
+      display: block;
+      color: inherit;
+      font-weight: 750;
+    }
+
+    .mode-tab small {
+      display: block;
+      margin-top: 2px;
+      color: currentColor;
+      opacity: 0.72;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 24px auto calc(48px + env(safe-area-inset-bottom));
+      flex: 1;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: 0 8px 26px rgba(28, 48, 56, 0.06);
+    }
+
+    .panel-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 1.15rem;
+    }
+
+    .panel-header p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .panel-body {
+      padding: 20px;
+    }
+
+    .form-section {
+      margin-bottom: 24px;
+    }
+
+    .form-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .section-title {
+      margin-bottom: 14px;
+      font-size: 0.98rem;
+      font-weight: 750;
+      color: var(--brand-strong);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      color: #34464d;
+      font-size: 0.91rem;
+      font-weight: 650;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid #cbd7dc;
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--text);
+      padding: 10px 11px;
+      min-height: 43px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    input[type="date"] {
+      min-height: 46px;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(15, 111, 120, 0.14);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .btn {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      font-weight: 750;
+      color: var(--text);
+      background: var(--surface-soft);
+      white-space: nowrap;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .actions .btn {
+      min-width: 0;
+      white-space: normal;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    .btn.primary {
+      color: #fff;
+      background: var(--brand);
+    }
+
+    .btn.primary:hover {
+      background: var(--brand-strong);
+    }
+
+    .btn.success {
+      color: #fff;
+      background: var(--ok);
+    }
+
+    .btn.warning {
+      color: #34210a;
+      background: #ffdca9;
+    }
+
+    .btn.danger {
+      color: #fff;
+      background: var(--danger);
+    }
+
+    .summary-panel {
+      position: sticky;
+      top: 16px;
+    }
+
+    .quote-number {
+      padding: 7px 10px;
+      border-radius: 999px;
+      color: var(--brand-strong);
+      background: #e7f2f4;
+      font-weight: 750;
+      font-size: 0.9rem;
+    }
+
+    .summary-empty {
+      color: var(--muted);
+      padding: 18px;
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+      background: #fbfcfc;
+    }
+
+    .line-items {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .line-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .line-item:last-child {
+      border-bottom: 0;
+    }
+
+    .line-item small {
+      display: block;
+      color: var(--muted);
+    }
+
+    .price-box {
+      display: grid;
+      gap: 9px;
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: var(--radius);
+      background: #f6fafb;
+      border: 1px solid var(--line);
+    }
+
+    .proposal-document .price-box {
+      margin-top: 48px;
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .price-row.total {
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--brand-strong);
+    }
+
+    .manual-price {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    .notice {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      color: #5a3d13;
+      background: #fff4df;
+      font-size: 0.9rem;
+    }
+
+    .proposal-document {
+      margin-top: 22px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .proposal-content {
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .proposal-letterhead {
+      padding: 18px 22px 12px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+      gap: 28px;
+    }
+
+    .company-brand {
+      min-width: 0;
+    }
+
+    .company-name {
+      margin: 0;
+      color: #00668a;
+      font-size: clamp(2.6rem, 7vw, 5.4rem);
+      font-weight: 850;
+      line-height: 0.9;
+      letter-spacing: 0.08em;
+    }
+
+    .company-subline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 22px;
+      margin-top: 4px;
+      color: #00668a;
+      font-size: 1.25rem;
+      font-weight: 750;
+      letter-spacing: 0.08em;
+    }
+
+    .company-web {
+      color: #c64d3a;
+      letter-spacing: 0;
+    }
+
+    .company-legal {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .company-details {
+      color: #00668a;
+      font-size: 1.18rem;
+      line-height: 1.3;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .company-details p {
+      margin: 0;
+    }
+
+    .proposal-title-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: end;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .proposal-title-row h2 {
+      margin: 0;
+      color: var(--text);
+      font-size: 1.6rem;
+      letter-spacing: 0.04em;
+    }
+
+    .proposal-title-meta {
+      display: grid;
+      grid-template-columns: repeat(2, auto);
+      gap: 8px 18px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: right;
+    }
+
+    .proposal-title-meta strong {
+      color: var(--text);
+    }
+
+    .proposal-data-strip {
+      background: #dcecf1;
+      padding: 10px 12px;
+    }
+
+    .proposal-data-strip .compact-block {
+      border: 0;
+      background: transparent;
+      padding: 0;
+    }
+
+    .proposal-line-table th {
+      background: #dcecf1;
+    }
+
+    .proposal-line-table tbody tr {
+      background: #fff;
+    }
+
+    .proposal-line-table tbody tr:nth-child(odd) {
+      background: #fff;
+    }
+
+    .quantity-cell,
+    .amount-cell {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .payment-block .conditions {
+      margin: 0;
+      padding-left: 20px;
+      color: #2f4249;
+      font-size: 0.94rem;
+    }
+
+    .payment-block .conditions li {
+      margin-bottom: 7px;
+    }
+
+    .payment-block .conditions li:last-child {
+      margin-bottom: 0;
+    }
+
+    .proposal-footer {
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-align: center;
+    }
+
+    .proposal-top-grid,
+    .proposal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .compact-block {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      background: #fbfcfc;
+    }
+
+    .compact-block h3 {
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      color: var(--brand-strong);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .compact-line {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 10px;
+      margin-bottom: 3px;
+      font-size: 0.92rem;
+    }
+
+    .compact-line span:first-child {
+      color: var(--muted);
+      font-weight: 650;
+    }
+
+    .compact-line strong {
+      font-weight: 800;
+    }
+
+    .info-block {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+      background: #fbfcfc;
+    }
+
+    .info-block h3 {
+      margin-bottom: 10px;
+      font-size: 1rem;
+      color: var(--brand-strong);
+    }
+
+    .info-block p {
+      margin-bottom: 5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: var(--radius);
+    }
+
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: var(--radius);
+    }
+
+    .table-scroll table {
+      min-width: 640px;
+    }
+
+    th,
+    td {
+      padding: 11px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: #34464d;
+      background: #eef3f5;
+      font-size: 0.9rem;
+    }
+
+    td:last-child,
+    th:last-child {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .conditions {
+      margin: 0;
+      padding-left: 18px;
+      color: #3f5158;
+    }
+
+    .conditions li {
+      margin-bottom: 6px;
+    }
+
+    .history-controls {
+      display: grid;
+      grid-template-columns: 1.4fr repeat(2, minmax(160px, 0.5fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .history-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .history-card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .history-card h3 {
+      margin-bottom: 4px;
+      font-size: 1rem;
+    }
+
+    .history-card p {
+      margin-bottom: 3px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 9px;
+    }
+
+    .tag {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #e9eff1;
+      color: #42565d;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .history-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-content: start;
+      justify-content: flex-end;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(22px + env(safe-area-inset-bottom));
+      z-index: 20;
+      transform: translateX(-50%);
+      width: max-content;
+      max-width: calc(100% - 28px - env(safe-area-inset-left) - env(safe-area-inset-right));
+      padding: 11px 14px;
+      border-radius: var(--radius);
+      color: #fff;
+      background: #21343a;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      text-align: center;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+
+    @media (max-width: 920px) {
+      .workspace,
+      .proposal-top-grid,
+      .proposal-grid,
+      .history-controls {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-panel {
+        position: static;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .topbar-inner,
+      main {
+        width: min(100% - 20px, 1180px);
+      }
+
+      h1 {
+        max-width: 100%;
+        font-size: clamp(1.18rem, 5.2vw, 1.35rem);
+        line-height: 1.15;
+        word-break: break-word;
+      }
+
+      .subtitle {
+        font-size: 0.95rem;
+      }
+
+      .today-pill {
+        min-width: 0;
+        width: fit-content;
+        max-width: 100%;
+        white-space: normal;
+      }
+
+      .brand-row,
+      .panel-header,
+      .history-card {
+        grid-template-columns: 1fr;
+        display: grid;
+      }
+
+      .history-actions {
+        text-align: left;
+        justify-content: flex-start;
+      }
+
+      .history-actions .btn {
+        flex: 1 1 140px;
+      }
+
+      .mode-tabs,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .panel-body,
+      .proposal-content {
+        padding: 16px;
+      }
+
+      .proposal-letterhead {
+        padding: 12px;
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .company-name {
+        font-size: clamp(2rem, 15vw, 3.1rem);
+        overflow-wrap: anywhere;
+      }
+
+      .company-subline {
+        gap: 8px 14px;
+        font-size: 1rem;
+      }
+
+      .company-details {
+        text-align: left;
+        white-space: normal;
+      }
+
+      .proposal-title-row {
+        grid-template-columns: 1fr;
+      }
+
+      .proposal-title-meta {
+        text-align: left;
+      }
+
+      .compact-line {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .actions .btn {
+        width: 100%;
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .table-scroll {
+        margin: 0 -16px;
+        padding: 0 16px;
+        border-radius: 0;
+      }
+    }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 6mm;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      .topbar,
+      .quote-form-panel,
+      .summary-panel,
+      .history-panel,
+      .toast,
+      .screen-only {
+        display: none !important;
+      }
+
+      main {
+        width: 100%;
+        margin: 0;
+      }
+
+      .workspace {
+        display: block;
+      }
+
+      .proposal-document {
+        display: block !important;
+        border: 0;
+        margin: 0;
+        border-radius: 0;
+      }
+
+      .proposal-content {
+        padding: 4mm 0 0;
+        gap: 3.5mm;
+      }
+
+      .proposal-top-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0;
+        align-items: start;
+      }
+
+      .proposal-letterhead {
+        padding: 0 0 3mm;
+        grid-template-columns: minmax(0, 1.35fr) auto;
+        gap: 8mm;
+        border-bottom: 0.35mm solid #b8c8ce;
+      }
+
+      .company-name {
+        font-size: 27pt;
+        line-height: 0.9;
+      }
+
+      .company-subline {
+        gap: 6mm;
+        margin-top: 1mm;
+        font-size: 9.5pt;
+      }
+
+      .company-legal {
+        margin-top: 1.5mm;
+        font-size: 7.5pt;
+      }
+
+      .company-details {
+        font-size: 9.5pt;
+        line-height: 1.35;
+      }
+
+      .proposal-title-row {
+        padding-bottom: 1mm;
+        border-bottom: 0;
+      }
+
+      .proposal-title-row h2 {
+        font-size: 15pt;
+      }
+
+      .proposal-title-meta {
+        gap: 1mm 5mm;
+        font-size: 8.5pt;
+      }
+
+      .compact-block {
+        min-height: 0;
+        padding: 2mm 2.6mm;
+        border: 0;
+        background: transparent;
+      }
+
+      .proposal-data-strip {
+        padding: 1.5mm 0;
+      }
+
+      .compact-block h3 {
+        margin-bottom: 2mm;
+        font-size: 8.8pt;
+      }
+
+      .compact-line {
+        grid-template-columns: 27mm 1fr !important;
+        gap: 3mm;
+        margin-bottom: 0.8mm;
+        font-size: 8.8pt;
+      }
+
+      .info-block {
+        padding: 0;
+        border: 0;
+        background: transparent;
+      }
+
+      .info-block h3 {
+        margin-bottom: 5px;
+        font-size: 9pt;
+      }
+
+      .info-block p {
+        margin-bottom: 2px;
+        font-size: 8.8pt;
+      }
+
+      th,
+      td {
+        padding: 3px 5px;
+        font-size: 8pt;
+      }
+
+      table {
+        border-top: 1px solid #2a363b;
+        border-bottom: 1px solid #2a363b;
+      }
+
+      .table-scroll {
+        overflow: visible;
+        border-radius: 0;
+      }
+
+      .table-scroll table {
+        min-width: 0;
+      }
+
+      .proposal-line-table th {
+        background: #dcecf1 !important;
+      }
+
+      .proposal-line-table tbody tr {
+        background: #fff !important;
+      }
+
+      .proposal-line-table tbody tr:nth-child(odd) {
+        background: #fff !important;
+      }
+
+      .proposal-document .price-box {
+        margin-top: 11mm;
+        margin-left: auto;
+        width: 72mm;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        gap: 4px;
+      }
+
+      .price-row.total {
+        padding-top: 5px;
+        font-size: 1rem;
+      }
+
+      .conditions {
+        font-size: 8pt;
+        padding-left: 14px;
+      }
+
+      .conditions li {
+        margin-bottom: 2px;
+      }
+
+      .payment-block {
+        padding: 3mm 4mm;
+        border: 0.25mm solid #d7e0e4;
+        border-radius: 1.8mm;
+        background: #fff;
+      }
+
+      .payment-block h3 {
+        margin-bottom: 2mm;
+        font-size: 8.8pt;
+      }
+
+      .payment-block .conditions {
+        padding-left: 4mm;
+        font-size: 8pt;
+      }
+
+      .payment-block .conditions li {
+        margin-bottom: 1.6mm;
+      }
+
+      .info-block,
+      .compact-block,
+      table,
+      .price-box {
+        break-inside: avoid;
+      }
+
+      .proposal-footer {
+        margin-top: 4mm;
+        padding-top: 2mm;
+        font-size: 7pt;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand-row">
+          <div>
+            <h1>Presupuestos Express Climatización</h1>
+            <p class="subtitle">Herramienta interna para crear presupuestos rápidos de instalación y sustitución de equipos Split.</p>
+          </div>
+          <div class="today-pill" id="todayLabel"></div>
+        </div>
+
+        <nav class="mode-tabs" aria-label="Selector principal">
+          <button class="mode-tab active" data-view="install">
+            <span>Instalación de Split</span>
+            <small>Equipo nuevo y montaje completo</small>
+          </button>
+          <button class="mode-tab" data-view="replacement">
+            <span>Sustitución de equipo</span>
+            <small>Cambio de máquina existente</small>
+          </button>
+          <button class="mode-tab" data-view="history">
+            <span>Historial</span>
+            <small>Consulta y búsqueda local</small>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section id="quoteWorkspace" class="workspace">
+        <article class="panel quote-form-panel">
+          <div class="panel-header">
+            <div>
+              <h2 id="formTitle">Instalación de Split</h2>
+              <p id="formSubtitle">Introduce los datos principales y calcula el presupuesto antes de guardarlo.</p>
+            </div>
+            <span class="quote-number" id="quoteNumberLabel"></span>
+          </div>
+          <div class="panel-body">
+            <form id="quoteForm">
+              <section class="form-section">
+                <div class="section-title">Datos del cliente</div>
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="clientName">Nombre o razón social</label>
+                    <input id="clientName" name="clientName" autocomplete="name" required>
+                  </div>
+                  <div class="field">
+                    <label for="clientPhone">Teléfono</label>
+                    <input id="clientPhone" name="clientPhone" type="tel" autocomplete="tel">
+                  </div>
+                  <div class="field">
+                    <label for="clientEmail">Email</label>
+                    <input id="clientEmail" name="clientEmail" type="email" autocomplete="email">
+                  </div>
+                  <div class="field">
+                    <label for="clientMunicipality">Municipio</label>
+                    <select id="clientMunicipality" name="clientMunicipality"></select>
+                  </div>
+                  <div class="field full">
+                    <label for="clientAddress">Dirección</label>
+                    <input id="clientAddress" name="clientAddress" autocomplete="street-address">
+                  </div>
+                  <div class="field full">
+                    <label for="clientNotes">Observaciones del cliente</label>
+                    <textarea id="clientNotes" name="clientNotes" placeholder="Horario preferente, acceso, persona de contacto..."></textarea>
+                  </div>
+                </div>
+              </section>
+
+              <section class="form-section">
+                <div class="section-title">Datos internos</div>
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="user">Comercial</label>
+                    <select id="user" name="user" required>
+                      <option value="">Selecciona quien entrega el presupuesto</option>
+                      <option value="Martí Barber Meliá">Martí Barber Meliá</option>
+                      <option value="Pere Palliser">Pere Palliser</option>
+                      <option value="Toni Camps">Toni Camps</option>
+                      <option value="Toni Meliá">Toni Meliá</option>
+                      <option value="Toni Pascual">Toni Pascual</option>
+                      <option value="Tere Meliá">Tere Meliá</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="quoteDate">Fecha</label>
+                    <input id="quoteDate" name="quoteDate" type="date">
+                  </div>
+                  <div class="field">
+                    <label for="quoteStatus">Estado</label>
+                    <select id="quoteStatus" name="quoteStatus">
+                      <option value="borrador">Borrador</option>
+                      <option value="enviado">Enviado</option>
+                      <option value="aceptado">Aceptado</option>
+                      <option value="rechazado">Rechazado</option>
+                    </select>
+                  </div>
+                </div>
+              </section>
+
+              <section class="form-section">
+                <div class="section-title">Datos técnicos</div>
+                <div id="dynamicFields" class="form-grid"></div>
+              </section>
+
+              <section class="form-section">
+                <div class="section-title">IVA</div>
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="vatRate">IVA aplicable</label>
+                    <select id="vatRate" name="vatRate">
+                      <option value="21">21 %</option>
+                      <option value="10">10 %</option>
+                      <option value="0">0 %</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="notice">Los importes se calculan automáticamente según las reglas configuradas en el código.</div>
+              </section>
+
+              <div class="actions">
+                <button class="btn primary" type="submit">Calcular presupuesto</button>
+                <button class="btn success" id="saveQuoteBtn" type="button">Guardar presupuesto</button>
+                <button class="btn" id="printQuoteBtn" type="button">Imprimir / guardar como PDF</button>
+                <button class="btn danger" id="clearFormBtn" type="button">Limpiar formulario</button>
+              </div>
+            </form>
+          </div>
+        </article>
+
+        <aside class="panel summary-panel">
+          <div class="panel-header">
+            <div>
+              <h2>Resumen del cálculo</h2>
+              <p>Revisa partidas, IVA y total.</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div id="summaryContent" class="summary-empty">Completa el formulario y pulsa “Calcular presupuesto”.</div>
+          </div>
+        </aside>
+      </section>
+
+      <section id="historyPanel" class="panel history-panel hidden">
+        <div class="panel-header">
+          <div>
+            <h2>Historial de presupuestos</h2>
+            <p>Los datos se guardan únicamente en este navegador mediante almacenamiento local.</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="history-controls">
+            <div class="field">
+              <label for="historySearch">Buscar por cliente, número, descripción o comercial</label>
+              <input id="historySearch" placeholder="Ej. Maó, Premium, PE-...">
+            </div>
+            <div class="field">
+              <label for="historyType">Tipo de trabajo</label>
+              <select id="historyType">
+                <option value="">Todos</option>
+                <option value="install">Instalación de Split</option>
+                <option value="replacement">Sustitución de equipo</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="historyStatus">Estado</label>
+              <select id="historyStatus">
+                <option value="">Todos</option>
+                <option value="borrador">Borrador</option>
+                <option value="enviado">Enviado</option>
+                <option value="aceptado">Aceptado</option>
+                <option value="rechazado">Rechazado</option>
+              </select>
+            </div>
+          </div>
+          <div id="historyList" class="history-list"></div>
+        </div>
+      </section>
+
+      <section id="proposalDocument" class="proposal-document hidden" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    // Configuración principal de precios. Para mantener la app, modifica estos importes sin tocar la lógica.
+    const CONFIG = {
+      municipalities: [
+        "Maó",
+        "Ciutadella",
+        "Alaior",
+        "Es Mercadal",
+        "Ferreries",
+        "Es Castell",
+        "Sant Lluís",
+        "Es Migjorn Gran"
+      ],
+      oldUnitRemoval: 75,
+      prices: {
+        install: {
+          "1X1": {
+            "25": { basic: 1414.61, medium: 1664.61, premium: 1997.95 },
+            "35": { basic: 1456.28, medium: 1744.61, premium: 2414.61 },
+            "50": { basic: 2081.28, medium: 2414.61, premium: 3164.61 }
+          },
+          "2X1": {
+            "25+25": { basic: 2746.92, medium: 3580.26, premium: 4080.26 },
+            "25+35": { basic: 3830.26, medium: 3830.26, premium: 4246.92 }
+          },
+          "3X1": {
+            "25+25+25": { basic: 4328.46, medium: 5328.46, premium: 6495.13 },
+            "25+25+35": { basic: 4328.46, medium: 5328.46, premium: 6495.13 }
+          }
+        },
+        replacement: {
+          "1X1": {
+            "25": { basic: 948.97, medium: 1198.97, premium: 1532.31 },
+            "35": { basic: 990.64, medium: 1278.97, premium: 1615.64 },
+            "50": { basic: 1615.64, medium: 1948.97, premium: 2698.97 }
+          },
+          "2X1": {
+            "25+25": { basic: 1998.46, medium: 2831.79, premium: 3331.79 },
+            "25+35": { basic: 2165.13, medium: 3081.79, premium: 3498.46 }
+          },
+          "3X1": {
+            "25+25+25": { basic: 3031.28, medium: 4031.28, premium: 5197.95 },
+            "25+25+35": { basic: 3031.28, medium: 4031.28, premium: 5197.95 }
+          }
+        }
+      }
+    };
+
+    const COMPANY = {
+      name: "Barber Coll Group, S.L.",
+      brand: "barbercoll",
+      tagline: "aigua · energia",
+      website: "www.barbercoll.com",
+      address: ["Carrer Teulers, 14 (POIFE)", "07750 - Ferreries - Menorca"],
+      phone: "Tel. (+34) 971 37 39 86",
+      email: "barbercoll@barbercoll.com",
+      footer: "Barber Coll Group, S.L. Reg.Merc.MENORCA, Tomo 19, Folio 83, Hoja IM-943 - NIF B07150048",
+      bankAccounts: [
+        "La Caixa ES51-2100-0268-3902-0009-6900. BIC: CAIXESBBXXX",
+        "Banca March ES52-0061-0061-2700-5511-0113"
+      ]
+    };
+    const STORAGE_KEY = "presupuestos_express_clima_v1";
+    const COUNTER_KEY = "presupuestos_express_clima_counter_v1";
+
+    const state = {
+      view: "install",
+      currentQuoteNumber: "",
+      currentCalculation: null,
+      editingQuoteId: null
+    };
+
+    const els = {
+      todayLabel: document.getElementById("todayLabel"),
+      quoteWorkspace: document.getElementById("quoteWorkspace"),
+      historyPanel: document.getElementById("historyPanel"),
+      proposalDocument: document.getElementById("proposalDocument"),
+      quoteForm: document.getElementById("quoteForm"),
+      formTitle: document.getElementById("formTitle"),
+      formSubtitle: document.getElementById("formSubtitle"),
+      quoteNumberLabel: document.getElementById("quoteNumberLabel"),
+      dynamicFields: document.getElementById("dynamicFields"),
+      clientMunicipality: document.getElementById("clientMunicipality"),
+      quoteDate: document.getElementById("quoteDate"),
+      quoteStatus: document.getElementById("quoteStatus"),
+      vatRate: document.getElementById("vatRate"),
+      summaryContent: document.getElementById("summaryContent"),
+      saveQuoteBtn: document.getElementById("saveQuoteBtn"),
+      printQuoteBtn: document.getElementById("printQuoteBtn"),
+      clearFormBtn: document.getElementById("clearFormBtn"),
+      historySearch: document.getElementById("historySearch"),
+      historyType: document.getElementById("historyType"),
+      historyStatus: document.getElementById("historyStatus"),
+      historyList: document.getElementById("historyList"),
+      toast: document.getElementById("toast")
+    };
+
+    const labels = {
+      install: "Instalación de Split",
+      replacement: "Sustitución de equipo",
+      basic: "Básica",
+      medium: "Media",
+      premium: "Premium"
+    };
+
+    const powerLabels = {
+      "25": "2,5 kW",
+      "35": "3,5 kW",
+      "50": "5,0 kW",
+      "25+25": "2,5 kW + 2,5 kW",
+      "25+35": "2,5 kW + 3,5 kW",
+      "25+25+25": "2,5 kW + 2,5 kW + 2,5 kW",
+      "25+25+35": "2,5 kW + 2,5 kW + 3,5 kW"
+    };
+
+    function init() {
+      els.todayLabel.textContent = formatDateLong(new Date());
+      fillMunicipalities();
+      resetForm(true);
+      bindEvents();
+      renderDynamicFields();
+      renderHistory();
+    }
+
+    function bindEvents() {
+      document.querySelectorAll(".mode-tab").forEach((button) => {
+        button.addEventListener("click", () => switchView(button.dataset.view));
+      });
+
+      els.quoteForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        calculateAndRender();
+      });
+
+      els.vatRate.addEventListener("change", () => recalculateVat());
+      els.quoteForm.addEventListener("change", handlePriceFieldChange);
+      els.saveQuoteBtn.addEventListener("click", saveQuote);
+      els.printQuoteBtn.addEventListener("click", printQuote);
+      els.clearFormBtn.addEventListener("click", () => resetForm(false));
+      els.historySearch.addEventListener("input", renderHistory);
+      els.historyType.addEventListener("change", renderHistory);
+      els.historyStatus.addEventListener("change", renderHistory);
+    }
+
+    function switchView(view) {
+      state.view = view;
+      document.querySelectorAll(".mode-tab").forEach((button) => {
+        button.classList.toggle("active", button.dataset.view === view);
+      });
+
+      if (view === "history") {
+        els.quoteWorkspace.classList.add("hidden");
+        els.proposalDocument.classList.add("hidden");
+        els.historyPanel.classList.remove("hidden");
+        renderHistory();
+        return;
+      }
+
+      els.historyPanel.classList.add("hidden");
+      els.quoteWorkspace.classList.remove("hidden");
+      renderDynamicFields();
+      resetForm(true);
+      els.formTitle.textContent = labels[view];
+      els.formSubtitle.textContent = view === "install"
+        ? "Presupuesto para equipo nuevo con instalación de Split."
+        : "Presupuesto para retirar o sustituir un equipo Split existente.";
+    }
+
+    function fillMunicipalities() {
+      els.clientMunicipality.innerHTML = CONFIG.municipalities
+        .map((municipality) => `<option value="${escapeHtml(municipality)}">${escapeHtml(municipality)}</option>`)
+        .join("");
+    }
+
+    function renderDynamicFields() {
+      if (state.view === "install") {
+        els.dynamicFields.innerHTML = `
+          <div class="field">
+            <label for="equipmentType">Tipo de equipo</label>
+            <select id="equipmentType" name="equipmentType">
+              <option value="1X1">1X1</option>
+              <option value="2X1">2X1 Multisplit</option>
+              <option value="3X1">3X1 Multisplit</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="power">Potencia del equipo</label>
+            <select id="power" name="power"></select>
+          </div>
+          <div class="field">
+            <label for="range">Gama del equipo</label>
+            <select id="range" name="range">
+              <option value="basic">Básica (Hisense, Mundoclima)</option>
+              <option value="medium">Media (Panasonic Basic, Mitsubishi Basic)</option>
+              <option value="premium">Premium (Panasonic Alta, Mitsubishi Alta, Daikin)</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label for="technicalNotes">Observaciones técnicas</label>
+            <textarea id="technicalNotes" name="technicalNotes" placeholder="Longitud de líneas, ubicación de unidad exterior, canaleta..."></textarea>
+          </div>
+        `;
+        document.getElementById("equipmentType").addEventListener("change", updatePowerOptions);
+        updatePowerOptions();
+        return;
+      }
+
+      els.dynamicFields.innerHTML = `
+        <div class="field">
+          <label for="power">Potencia del equipo nuevo</label>
+          <select id="power" name="power">
+            ${allPowerOptions()}
+          </select>
+        </div>
+        <div class="field">
+          <label for="range">Gama del equipo</label>
+          <select id="range" name="range">
+            <option value="basic">Básica</option>
+            <option value="medium">Media</option>
+            <option value="premium">Premium</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="oldUnitRemoval">Retirada y gestión del equipo antiguo</label>
+          <select id="oldUnitRemoval" name="oldUnitRemoval">
+            <option value="no">No</option>
+            <option value="yes">Sí (+75 €)</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label for="technicalNotes">Observaciones técnicas</label>
+          <textarea id="technicalNotes" name="technicalNotes" placeholder="Estado de líneas existentes, soporte, desagüe..."></textarea>
+        </div>
+      `;
+    }
+
+    function updatePowerOptions() {
+      const type = document.getElementById("equipmentType").value;
+      const powerSelect = document.getElementById("power");
+      powerSelect.innerHTML = Object.keys(CONFIG.prices.install[type])
+        .map((power) => `<option value="${power}">${powerLabels[power]}</option>`)
+        .join("");
+    }
+
+    function allPowerOptions() {
+      return Object.keys(powerLabels)
+        .map((power) => `<option value="${power}">${powerLabels[power]}</option>`)
+        .join("");
+    }
+
+    function resetForm(keepView) {
+      state.currentQuoteNumber = generateQuoteNumber();
+      state.currentCalculation = null;
+      state.editingQuoteId = null;
+      els.quoteNumberLabel.textContent = state.currentQuoteNumber;
+      els.quoteDate.value = toDateInputValue(new Date());
+      els.quoteStatus.value = "borrador";
+      els.vatRate.value = "21";
+      els.quoteForm.reset();
+      els.quoteDate.value = toDateInputValue(new Date());
+      els.quoteStatus.value = "borrador";
+      els.vatRate.value = "21";
+      els.clientMunicipality.value = CONFIG.municipalities[0];
+      if (!keepView) {
+        renderDynamicFields();
+      }
+      els.summaryContent.className = "summary-empty";
+      els.summaryContent.textContent = "Completa el formulario y pulsa “Calcular presupuesto”.";
+      els.proposalDocument.classList.add("hidden");
+      els.proposalDocument.innerHTML = "";
+    }
+
+    function calculateAndRender() {
+      if (!els.quoteForm.reportValidity()) return;
+
+      const data = readFormData();
+      const calculation = calculateQuote(data);
+      state.currentCalculation = calculation;
+      renderSummary(calculation);
+      renderProposal(calculation);
+    }
+
+    function recalculateVat() {
+      if (!state.currentCalculation) return;
+      const manualBase = state.currentCalculation.manualBase || state.currentCalculation.base;
+      const vatRate = Number(els.vatRate.value);
+      state.currentCalculation.manualBase = manualBase;
+      state.currentCalculation.vatRate = vatRate;
+      state.currentCalculation.vatAmount = roundMoney(manualBase * (vatRate / 100));
+      state.currentCalculation.total = roundMoney(manualBase + state.currentCalculation.vatAmount);
+      renderSummary(state.currentCalculation);
+      renderProposal(state.currentCalculation);
+    }
+
+    function handlePriceFieldChange(event) {
+      const priceFields = ["equipmentType", "power", "range", "oldUnitRemoval"];
+      if (!priceFields.includes(event.target.id)) return;
+      if (!state.currentCalculation) return;
+      state.currentCalculation = null;
+      els.summaryContent.className = "summary-empty";
+      els.summaryContent.textContent = "Hay cambios técnicos pendientes. Pulsa “Calcular presupuesto” para actualizar el importe.";
+      els.proposalDocument.classList.add("hidden");
+    }
+
+    function readFormData() {
+      const formData = new FormData(els.quoteForm);
+      const data = Object.fromEntries(formData.entries());
+      data.quoteNumber = state.currentQuoteNumber;
+      data.workType = state.view;
+      data.workTypeLabel = labels[state.view];
+      data.quoteDate = els.quoteDate.value || toDateInputValue(new Date());
+      data.status = els.quoteStatus.value;
+      data.vatRate = Number(els.vatRate.value);
+      data.equipmentType = state.view === "install" ? data.equipmentType : deriveEquipmentType(data.power);
+      delete data.difficulty;
+      return data;
+    }
+
+    function calculateQuote(data) {
+      const priceTable = CONFIG.prices[data.workType];
+      const baseEquipment = priceTable[data.equipmentType][data.power][data.range];
+      const lines = [
+        {
+          concept: data.workType === "install" ? "Instalación nueva equipo Aire Acondicionado" : "Equipo y sustitución Split",
+          detail: `${data.equipmentType} · ${powerLabels[data.power]} · Gama ${labels[data.range]}`,
+          amount: baseEquipment
+        }
+      ];
+
+      if (data.workType === "replacement" && data.oldUnitRemoval === "yes") {
+        lines.push({
+          concept: "Retirada y gestión del equipo antiguo",
+          detail: "Importe orientativo de gestión del equipo retirado",
+          amount: CONFIG.oldUnitRemoval
+        });
+      }
+
+      const base = roundMoney(lines.reduce((sum, line) => sum + line.amount, 0));
+      const manualBase = base;
+      const vatAmount = roundMoney(manualBase * (data.vatRate / 100));
+      const total = roundMoney(manualBase + vatAmount);
+
+      return {
+        id: state.editingQuoteId || createId(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        ...data,
+        lines,
+        automaticBase: base,
+        base,
+        manualBase,
+        vatAmount,
+        total
+      };
+    }
+
+    function renderSummary(calculation) {
+      els.summaryContent.className = "";
+      els.summaryContent.innerHTML = `
+        <div class="line-items">
+          ${calculation.lines.map((line) => `
+            <div class="line-item">
+              <div>
+                <strong>${escapeHtml(line.concept)}</strong>
+                <small>${escapeHtml(line.detail)}</small>
+              </div>
+              <strong>${formatMoney(line.amount)}</strong>
+            </div>
+          `).join("")}
+        </div>
+        <div class="price-box">
+          <div class="price-row"><span>Base imponible</span><strong>${formatMoney(calculation.manualBase)}</strong></div>
+          <div class="price-row"><span>IVA ${calculation.vatRate}%</span><strong>${formatMoney(calculation.vatAmount)}</strong></div>
+          <div class="price-row total"><span>Total</span><strong>${formatMoney(calculation.total)}</strong></div>
+        </div>
+        <div class="manual-price">
+          <p><strong>${escapeHtml(calculation.quoteNumber)}</strong> · ${escapeHtml(calculation.workTypeLabel)} · Estado: ${escapeHtml(labelsStatus(calculation.status))}</p>
+          <p>${escapeHtml(calculation.clientName || "Cliente pendiente")} · ${escapeHtml(calculation.clientMunicipality || "")}</p>
+        </div>
+      `;
+    }
+
+    function renderProposal(calculation) {
+      const notes = [calculation.clientNotes, calculation.technicalNotes].filter(Boolean).join("\n");
+      els.proposalDocument.classList.remove("hidden");
+      els.proposalDocument.innerHTML = `
+        <div class="proposal-letterhead">
+          <div class="company-brand">
+            <p class="company-name">${escapeHtml(COMPANY.brand)}</p>
+            <div class="company-subline">
+              <span>${escapeHtml(COMPANY.tagline)}</span>
+              <span class="company-web">${escapeHtml(COMPANY.website)}</span>
+            </div>
+            <p class="company-legal">${escapeHtml(COMPANY.name)}</p>
+          </div>
+          <div class="company-details">
+            ${COMPANY.address.map((line) => `<p>${escapeHtml(line)}</p>`).join("")}
+            <p>${escapeHtml(COMPANY.phone)}</p>
+            <p>${escapeHtml(COMPANY.email)}</p>
+          </div>
+        </div>
+        <div class="proposal-content">
+          <div class="proposal-title-row">
+            <h2>PRESUPUESTO</h2>
+            <div class="proposal-title-meta">
+              <span>Fecha: <strong>${escapeHtml(formatDateShort(calculation.quoteDate))}</strong></span>
+              <span>Nº: <strong>${escapeHtml(calculation.quoteNumber)}</strong></span>
+            </div>
+          </div>
+
+          <div class="proposal-top-grid proposal-data-strip">
+            <div class="compact-block">
+              <h3>Datos del cliente</h3>
+              <div class="compact-line"><span>Cliente</span><strong>${escapeHtml(calculation.clientName || "-")}</strong></div>
+              <div class="compact-line"><span>Dirección</span><strong>${escapeHtml(calculation.clientAddress || "-")}</strong></div>
+              <div class="compact-line"><span>Municipio</span><strong>${escapeHtml(calculation.clientMunicipality || "-")}</strong></div>
+              <div class="compact-line"><span>Teléfono</span><strong>${escapeHtml(calculation.clientPhone || "-")}</strong></div>
+              <div class="compact-line"><span>Email</span><strong>${escapeHtml(calculation.clientEmail || "-")}</strong></div>
+            </div>
+            <div class="compact-block">
+              <h3>Datos del presupuesto</h3>
+              <div class="compact-line"><span>Num. Presup.:</span><strong>${escapeHtml(calculation.quoteNumber)}</strong></div>
+              <div class="compact-line"><span>Fecha:</span><strong>${escapeHtml(formatDateShort(calculation.quoteDate))}</strong></div>
+              <div class="compact-line"><span>Tipo:</span><strong>${escapeHtml(calculation.workTypeLabel)}</strong></div>
+            </div>
+          </div>
+
+          <div class="info-block">
+            <h3>Descripción del trabajo</h3>
+            <p>${escapeHtml(buildWorkDescription(calculation))}</p>
+          </div>
+
+          <div class="table-scroll" role="region" aria-label="Detalle del presupuesto">
+            <table class="proposal-line-table">
+              <thead>
+                <tr>
+                  <th>Concepto</th>
+                  <th>Detalle</th>
+                  <th>Cantidad</th>
+                  <th>Precio/Ud.</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${calculation.lines.map((line) => `
+                  <tr>
+                    <td>${escapeHtml(line.concept)}</td>
+                    <td>${escapeHtml(line.detail)}</td>
+                    <td class="quantity-cell">1,000</td>
+                    <td class="amount-cell">${formatMoney(line.amount)}</td>
+                    <td class="amount-cell">${formatMoney(line.amount)}</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="price-box">
+            <div class="price-row"><span>Base imponible</span><strong>${formatMoney(calculation.manualBase)}</strong></div>
+            <div class="price-row"><span>IVA ${calculation.vatRate}%</span><strong>${formatMoney(calculation.vatAmount)}</strong></div>
+            <div class="price-row total"><span>Total presupuesto</span><strong>${formatMoney(calculation.total)}</strong></div>
+          </div>
+
+          <div class="info-block">
+            <h3>Observaciones</h3>
+            <p>${escapeHtml(notes || "Sin observaciones adicionales.")}</p>
+          </div>
+
+          <div class="info-block payment-block">
+            <h3>Condiciones</h3>
+            <ul class="conditions">
+              <li>Validez del presupuesto: 1 mes.</li>
+              <li>Condiciones de pago: 50% a la aceptaci&oacute;n del presupuesto por transferencia bancaria y 50% a la finalizaci&oacute;n de los trabajos mediante domiciliaci&oacute;n bancaria.</li>
+              <li>N&uacute;meros de IBAN para pago por transferencia: ${escapeHtml(COMPANY.bankAccounts[0])} &middot; ${escapeHtml(COMPANY.bankAccounts[1])}.</li>
+              <li>No incluye trabajos de alba&ntilde;iler&iacute;a, pintura, electricidad adicional o medios auxiliares especiales salvo indicaci&oacute;n expresa.</li>
+              <li>Garant&iacute;a seg&uacute;n normativa vigente y condiciones del fabricante.</li>
+            </ul>
+          </div>
+
+          <div class="proposal-footer">${escapeHtml(COMPANY.footer)}</div>
+        </div>
+      `;
+    }
+
+    function buildWorkDescription(calculation) {
+      const base = calculation.workType === "install"
+        ? "Instalación nueva de aire acondicionado tipo Split"
+        : "Sustitución de equipo existente de aire acondicionado tipo Split";
+      const oldUnit = calculation.workType === "replacement"
+        ? `. Retirada de equipo antiguo: ${calculation.oldUnitRemoval === "yes" ? "sí" : "no"}`
+        : "";
+      return `${base} ${calculation.equipmentType}, potencia ${powerLabels[calculation.power]}, gama ${labels[calculation.range]}${oldUnit}.`;
+    }
+
+    function saveQuote() {
+      if (!state.currentCalculation) {
+        calculateAndRender();
+      }
+      if (!state.currentCalculation) return;
+
+      const quote = {
+        ...state.currentCalculation,
+        ...readFormData(),
+        manualBase: state.currentCalculation.manualBase || state.currentCalculation.base,
+        vatRate: Number(els.vatRate.value),
+        updatedAt: new Date().toISOString()
+      };
+      quote.vatAmount = roundMoney(quote.manualBase * (quote.vatRate / 100));
+      quote.total = roundMoney(quote.manualBase + quote.vatAmount);
+
+      const quotes = loadQuotes();
+      const existingIndex = quotes.findIndex((item) => item.id === quote.id);
+      let shouldCommitQuoteNumber = false;
+      if (existingIndex >= 0) {
+        quotes[existingIndex] = quote;
+      } else {
+        quotes.unshift(quote);
+        shouldCommitQuoteNumber = true;
+      }
+
+      if (!setStorageItem(STORAGE_KEY, JSON.stringify(quotes))) return;
+      if (shouldCommitQuoteNumber) {
+        commitQuoteNumber();
+      }
+      state.currentCalculation = quote;
+      state.editingQuoteId = quote.id;
+      renderSummary(quote);
+      renderProposal(quote);
+      renderHistory();
+      showToast("Presupuesto guardado correctamente.");
+    }
+
+    function printQuote() {
+      if (!state.currentCalculation) {
+        calculateAndRender();
+      }
+      if (!state.currentCalculation) return;
+      window.print();
+    }
+
+    function buildCopyText(quote) {
+      return [
+        `Presupuesto ${quote.quoteNumber}`,
+        `Fecha: ${formatDateShort(quote.quoteDate)}`,
+        `Usuario: ${quote.user || "-"}`,
+        `Cliente: ${quote.clientName || "-"}`,
+        `Tipo: ${quote.workTypeLabel}`,
+        `Descripción: ${buildWorkDescription(quote)}`,
+        "",
+        "Conceptos:",
+        ...quote.lines.map((line) => `- ${line.concept}: ${formatMoney(line.amount)} (${line.detail})`),
+        "",
+        `Base imponible: ${formatMoney(quote.manualBase)}`,
+        `IVA ${quote.vatRate}%: ${formatMoney(quote.vatAmount)}`,
+        `Total: ${formatMoney(quote.total)}`,
+        "",
+        `Observaciones: ${quote.technicalNotes || quote.clientNotes || "Sin observaciones adicionales."}`,
+        "",
+        `Condiciones:\n- Validez del presupuesto: 1 mes.\n- Condiciones de pago: 50% a la aceptación del presupuesto por transferencia bancaria y 50% a la finalización de los trabajos mediante domiciliación bancaria.\n- Números de IBAN para pago por transferencia: ${COMPANY.bankAccounts.join(" · ")}.\n- No incluye trabajos de albañilería, pintura, electricidad adicional o medios auxiliares especiales salvo indicación expresa.\n- Garantía según normativa vigente y condiciones del fabricante.`
+      ].join("\n");
+    }
+
+    function renderHistory() {
+      const search = els.historySearch.value.trim().toLowerCase();
+      const type = els.historyType.value;
+      const status = els.historyStatus.value;
+      const quotes = loadQuotes().filter((quote) => {
+        const haystack = [
+          quote.quoteNumber,
+          quote.clientName,
+          quote.clientMunicipality,
+          quote.user,
+          quote.workTypeLabel,
+          quote.status,
+          quote.range ? labels[quote.range] : "",
+          quote.power ? powerLabels[quote.power] : ""
+        ].join(" ").toLowerCase();
+        return (!search || haystack.includes(search))
+          && (!type || quote.workType === type)
+          && (!status || quote.status === status);
+      });
+
+      if (!quotes.length) {
+        els.historyList.innerHTML = `<div class="summary-empty">No hay presupuestos guardados que coincidan con la búsqueda.</div>`;
+        return;
+      }
+
+      els.historyList.innerHTML = quotes.map((quote) => `
+        <article class="history-card">
+          <div>
+            <h3>${escapeHtml(quote.quoteNumber)} · ${escapeHtml(quote.clientName || "Cliente sin nombre")}</h3>
+            <p>${escapeHtml(quote.workTypeLabel)} · ${escapeHtml(formatDateShort(quote.quoteDate))} · ${escapeHtml(quote.clientMunicipality || "-")}</p>
+            <p><strong>${formatMoney(quote.total)}</strong> IVA incluido</p>
+            <div class="tag-row">
+              <span class="tag">${escapeHtml(labelsStatus(quote.status))}</span>
+              <span class="tag">${escapeHtml(quote.equipmentType)}</span>
+              <span class="tag">${escapeHtml(powerLabels[quote.power])}</span>
+              <span class="tag">Gama ${escapeHtml(labels[quote.range])}</span>
+              <span class="tag">Entregado por: ${escapeHtml(quote.user || "-")}</span>
+            </div>
+          </div>
+          <div class="history-actions">
+            <button class="btn primary" type="button" onclick="loadQuoteForView('${quote.id}')">Ver / editar</button>
+            <button class="btn warning" type="button" onclick="copyQuoteFromHistory('${quote.id}')">Copiar</button>
+            <button class="btn danger" type="button" onclick="deleteQuote('${quote.id}')">Eliminar</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function loadQuoteForView(id) {
+      const quote = loadQuotes().find((item) => item.id === id);
+      if (!quote) return;
+
+      state.view = quote.workType;
+      state.currentQuoteNumber = quote.quoteNumber;
+      state.editingQuoteId = quote.id;
+      state.currentCalculation = quote;
+
+      document.querySelectorAll(".mode-tab").forEach((button) => {
+        button.classList.toggle("active", button.dataset.view === quote.workType);
+      });
+      els.historyPanel.classList.add("hidden");
+      els.quoteWorkspace.classList.remove("hidden");
+      renderDynamicFields();
+
+      els.quoteNumberLabel.textContent = quote.quoteNumber;
+      els.formTitle.textContent = labels[quote.workType];
+      setFieldValue("user", quote.user);
+      setFieldValue("clientName", quote.clientName);
+      setFieldValue("clientPhone", quote.clientPhone);
+      setFieldValue("clientEmail", quote.clientEmail);
+      setFieldValue("clientMunicipality", quote.clientMunicipality);
+      setFieldValue("clientAddress", quote.clientAddress);
+      setFieldValue("clientNotes", quote.clientNotes);
+      setFieldValue("quoteDate", quote.quoteDate);
+      setFieldValue("quoteStatus", quote.status);
+      setFieldValue("vatRate", quote.vatRate);
+
+      if (quote.workType === "install") {
+        setFieldValue("equipmentType", quote.equipmentType);
+        updatePowerOptions();
+      }
+      setFieldValue("power", quote.power);
+      setFieldValue("range", quote.range);
+      setFieldValue("oldUnitRemoval", quote.oldUnitRemoval);
+      setFieldValue("technicalNotes", quote.technicalNotes);
+      renderSummary(quote);
+      renderProposal(quote);
+      showToast("Presupuesto cargado para consulta o edición.");
+    }
+
+    async function copyQuoteFromHistory(id) {
+      const quote = loadQuotes().find((item) => item.id === id);
+      if (!quote) return;
+      try {
+        await navigator.clipboard.writeText(buildCopyText(quote));
+      } catch (error) {
+        fallbackCopy(buildCopyText(quote));
+      }
+      showToast("Resumen copiado al portapapeles.");
+    }
+
+    function deleteQuote(id) {
+      const quote = loadQuotes().find((item) => item.id === id);
+      if (!quote) return;
+      const ok = confirm(`¿Eliminar el presupuesto ${quote.quoteNumber}?`);
+      if (!ok) return;
+      const quotes = loadQuotes().filter((item) => item.id !== id);
+      if (!setStorageItem(STORAGE_KEY, JSON.stringify(quotes))) return;
+      renderHistory();
+      showToast("Presupuesto eliminado.");
+    }
+
+    function loadQuotes() {
+      try {
+        const quotes = JSON.parse(getStorageItem(STORAGE_KEY)) || [];
+        return Array.isArray(quotes) ? quotes.map(normalizeQuoteForCurrentRules) : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function normalizeQuoteForCurrentRules(quote) {
+      const legacyInstallConcept = ["Equipo e instalación nueva", "Split"].join(" ");
+      const lines = Array.isArray(quote.lines)
+        ? quote.lines
+            .filter((line) => !String(line.concept || "").toLowerCase().startsWith("dificultad de acceso"))
+            .map((line) => ({
+              ...line,
+              concept: line.concept === legacyInstallConcept
+                ? "Instalación nueva equipo Aire Acondicionado"
+                : line.concept
+            }))
+        : [];
+      const automaticBase = roundMoney(lines.reduce((sum, line) => sum + Number(line.amount || 0), 0));
+      const oldManualBase = Number(quote.manualBase);
+      const oldBase = Number(quote.base);
+      const oldAutomaticBase = Number(quote.automaticBase);
+      const manualBase = Number.isFinite(oldManualBase)
+        && oldManualBase !== oldBase
+        && oldManualBase !== oldAutomaticBase
+        ? roundMoney(oldManualBase)
+        : automaticBase;
+      const vatRate = Number(quote.vatRate !== undefined && quote.vatRate !== null ? quote.vatRate : 21);
+      const vatAmount = roundMoney(manualBase * (vatRate / 100));
+      const { difficulty, ...cleanQuote } = quote;
+
+      return {
+        ...cleanQuote,
+        lines,
+        automaticBase,
+        base: automaticBase,
+        manualBase,
+        vatRate,
+        vatAmount,
+        total: roundMoney(manualBase + vatAmount)
+      };
+    }
+
+    function deriveEquipmentType(power) {
+      const units = power.split("+").length;
+      if (units === 1) return "1X1";
+      if (units === 2) return "2X1";
+      return "3X1";
+    }
+
+    function generateQuoteNumber() {
+      const counter = Number(getStorageItem(COUNTER_KEY) || "1");
+      const stamp = toDateInputValue(new Date()).replace(/-/g, "");
+      const paddedCounter = `0000${counter}`.slice(-4);
+      return `PE-${stamp}-${paddedCounter}`;
+    }
+
+    function commitQuoteNumber() {
+      const counter = Number(getStorageItem(COUNTER_KEY) || "1");
+      setStorageItem(COUNTER_KEY, String(counter + 1));
+    }
+
+    function getStorageItem(key) {
+      try {
+        return localStorage.getItem(key);
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function setStorageItem(key, value) {
+      try {
+        localStorage.setItem(key, value);
+        return true;
+      } catch (error) {
+        showToast("Safari no permite guardar datos locales en este modo.");
+        return false;
+      }
+    }
+
+    function createId() {
+      if (window.crypto && typeof window.crypto.randomUUID === "function") return window.crypto.randomUUID();
+      return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
+    function setFieldValue(id, value) {
+      const field = document.getElementById(id);
+      if (field && value !== undefined && value !== null) {
+        field.value = value;
+      }
+    }
+
+    function parseCurrencyInput(value) {
+      const parsed = Number(String(value || "0").replace(",", "."));
+      return Number.isFinite(parsed) ? roundMoney(parsed) : 0;
+    }
+
+    function roundMoney(value) {
+      return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+    }
+
+    function formatMoney(value) {
+      return new Intl.NumberFormat("es-ES", {
+        style: "currency",
+        currency: "EUR"
+      }).format(Number(value || 0));
+    }
+
+    function formatDateLong(date) {
+      return new Intl.DateTimeFormat("es-ES", {
+        weekday: "long",
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+      }).format(date);
+    }
+
+    function formatDateShort(dateValue) {
+      if (!dateValue) return "";
+      return new Intl.DateTimeFormat("es-ES").format(new Date(`${dateValue}T00:00:00`));
+    }
+
+    function toDateInputValue(date) {
+      const year = date.getFullYear();
+      const month = `0${date.getMonth() + 1}`.slice(-2);
+      const day = `0${date.getDate()}`.slice(-2);
+      return `${year}-${month}-${day}`;
+    }
+
+    function labelsStatus(status) {
+      const map = {
+        borrador: "Borrador",
+        enviado: "Enviado",
+        aceptado: "Aceptado",
+        rechazado: "Rechazado"
+      };
+      return map[status] || status;
+    }
+
+    function escapeHtml(value) {
+      return String(value === undefined || value === null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function fallbackCopy(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.top = "0";
+      textarea.style.left = "0";
+      textarea.style.width = "1px";
+      textarea.style.height = "1px";
+      textarea.style.opacity = "0";
+      textarea.style.fontSize = "16px";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      textarea.setSelectionRange(0, textarea.value.length);
+      try {
+        document.execCommand("copy");
+      } finally {
+        document.body.removeChild(textarea);
+      }
+    }
+
+    function showToast(message) {
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      window.clearTimeout(showToast.timeoutId);
+      showToast.timeoutId = window.setTimeout(() => {
+        els.toast.classList.remove("show");
+      }, 2600);
+    }
+
+    init();
+  </script>
+</body>
+</html>
+
